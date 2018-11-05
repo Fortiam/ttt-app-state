@@ -61,27 +61,41 @@ const state = (function(){
 //redraw the board parent element with the rows/cells
 function renderBoard(){
 //1. build a `` of the html code for all cells.
-    let newBoardCells = state.cellsArray.map(element => renderCell(element));
+  //  let newBoardCells = state.cellsArray.map(element => renderCell(element));
 //2. send that var into parent element (board)
+let newBoardCells = "";
+state.cellsArray.forEach(function(element) {
+    if(element.id === 0 || element.id === 3 || element.id === 6){
+        newBoardCells += `<div class="row">`;
+    }
+    newBoardCells += `<div class="cell" id="${element.id}">
+             <p>${element.placed}</p>
+             </div>`;
+    if(element.id === 2 || element.id === 5 || element.id === 8){
+        newBoardCells += `</div>`;
+    }
+});
+
 $('.board').html(newBoardCells);
 }
 
-function renderCell(individualCell){
-    //this just needs to build one cell's html.
-    //return it ^^.
-    let rowOfCells = "";
-    if(individualCell.id === 0 || individualCell.id === 3 || individualCell.id === 6){
-         rowOfCells += `<div class="row">`;
-    }
-    rowOfCells += `<div class="cell" id="${individualCell.id}">
-        <p>${individualCell.placed}</p>
-        </div>`;
-    if(individualCell.id === 2 || individualCell.id === 5 || individualCell.id === 8){
-        console.log(individualCell.id); //this should be 2, 5, 8 to the console.
-        rowOfCells += `</div>`;
-    }
-    return rowOfCells;
-}
+// function renderCell(individualCell){
+//     //this just needs to build one cell's html.
+//     //return it ^^.
+//     let rowOfCells = "";
+//     if(individualCell.id === 0 || individualCell.id === 3 || individualCell.id === 6){
+//         //console.log(individualCell.id); // should be 0, 3, 6. it also is...
+//         rowOfCells += `<div class="row">`;
+//     }
+//     rowOfCells += `<div class="cell" id="${individualCell.id}">
+//         <p>${individualCell.placed}</p>
+//         </div>`;
+//     if(individualCell.id === 2 || individualCell.id === 5 || individualCell.id === 8){
+//        // console.log(individualCell.id); //this should be 2, 5, 8 to the console. ... it is..
+//         rowOfCells += `</div>`;
+//     }
+//     return rowOfCells;
+// }
 
 
 // Event Listeners
