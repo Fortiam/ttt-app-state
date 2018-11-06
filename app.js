@@ -69,7 +69,7 @@ state.cellsArray.forEach(function(element) {
         newBoardCells += `<div class="row">`;
     }
     newBoardCells += `<div class="cell" id="${element.id}">
-             <p>${element.placed}</p>
+             <p>${element.placed? element.placed : '&nbsp;'}</p>
              </div>`;
     if(element.id === 2 || element.id === 5 || element.id === 8){
         newBoardCells += `</div>`;
