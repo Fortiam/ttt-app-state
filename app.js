@@ -9,23 +9,24 @@ const state = (function(){
     const cellsArray = [
         //row : 
          //[
-            { id: 0, placed: ''},
-            { id: 1, placed: ''},
-            { id: 2, placed: ''},
+            { id: 0, placed: '', isAWinner: false},
+            { id: 1, placed: '', isAWinner: false},
+            { id: 2, placed: '', isAWinner: false},
         // ],
         // row2 : [
-            { id: 3, placed: ''},
-            { id: 4, placed: ''},
-            { id: 5, placed: ''},
+            { id: 3, placed: '', isAWinner: false},
+            { id: 4, placed: '', isAWinner: false},
+            { id: 5, placed: '', isAWinner: false},
         // ],
         // row3 : [    
-            { id: 6, placed: ''},
-            { id: 7, placed: ''},
-            { id: 8, placed: ''},
+            { id: 6, placed: '', isAWinner: false},
+            { id: 7, placed: '', isAWinner: false},
+            { id: 8, placed: '', isAWinner: false},
          ];
     //};
     //one variable to hold next click is X or O
     let turnIsX = false;//this var returns false make it an O. true make an X.
+    let victory = false; //change this at winning check to stop further moves.
     const validateEmptyCell = function(whichCell){   //whichCell needs to be the id of the clicked cell.
         //method to check if target clicked cell has a non-empty placed string.
         if(state.cellsArray[whichCell].placed.length === 0){
@@ -46,9 +47,64 @@ const state = (function(){
     };
     const ResetCells = function(){
         //this method reads the cellsArray and sets the values to an empty string.
-        this.cellsArray.forEach(element => element.placed = '');
+        this.cellsArray.forEach(function(element) {
+            element.placed = '';
+            element.isAWinner = false; //sad
+        });
+        this.victory = false;
     };
-    return { cellsArray, turnIsX, validateEmptyCell,placeValueintoCell,ResetCells, };
+    const checkForWin = function(){
+            //we win if all rows match, or all columns match, or diagonals match.
+            if(state.cellsArray[0].placed === state.cellsArray[3].placed && state.cellsArray[3].placed=== state.cellsArray[6].placed && state.cellsArray[6].placed !== ''){
+                this.victory = true;
+                state.cellsArray[0].isAWinner = true;
+                state.cellsArray[3].isAWinner = true;
+                state.cellsArray[6].isAWinner = true;
+            }
+            if(state.cellsArray[1].placed === state.cellsArray[4].placed && state.cellsArray[4].placed === state.cellsArray[7].placed&& state.cellsArray[7].placed !== ''){
+                this.victory = true;
+                state.cellsArray[1].isAWinner = true;
+                state.cellsArray[4].isAWinner = true;
+                state.cellsArray[7].isAWinner = true;
+            }
+            if(state.cellsArray[2].placed === state.cellsArray[5].placed&& state.cellsArray[5].placed === state.cellsArray[8].placed&& state.cellsArray[8].placed !== ''){
+                this.victory = true;
+                state.cellsArray[2].isAWinner = true;
+                state.cellsArray[5].isAWinner = true;
+                state.cellsArray[8].isAWinner = true;
+            }
+            if(state.cellsArray[0].placed === state.cellsArray[1].placed && state.cellsArray[1].placed=== state.cellsArray[2].placed && state.cellsArray[2].placed !== ''){
+                this.victory = true;
+                state.cellsArray[0].isAWinner = true;
+                state.cellsArray[1].isAWinner = true;
+                state.cellsArray[2].isAWinner = true;
+            }
+            if(state.cellsArray[3].placed === state.cellsArray[4].placed && state.cellsArray[4].placed === state.cellsArray[5].placed&& state.cellsArray[5].placed !== ''){
+                this.victory = true;
+                state.cellsArray[3].isAWinner = true;
+                state.cellsArray[4].isAWinner = true;
+                state.cellsArray[5].isAWinner = true;
+            }
+            if(state.cellsArray[6].placed === state.cellsArray[7].placed&& state.cellsArray[7].placed === state.cellsArray[8].placed&& state.cellsArray[8].placed !== ''){
+                this.victory = true;
+                state.cellsArray[6].isAWinner = true;
+                state.cellsArray[7].isAWinner = true;
+                state.cellsArray[8].isAWinner = true;
+            }
+            if(state.cellsArray[0].placed === state.cellsArray[4].placed && state.cellsArray[4].placed === state.cellsArray[8].placed&& state.cellsArray[8].placed !== ''){
+                this.victory = true;
+                state.cellsArray[0].isAWinner = true;
+                state.cellsArray[4].isAWinner = true;
+                state.cellsArray[8].isAWinner = true;
+            }
+            if(state.cellsArray[2].placed === state.cellsArray[4].placed&& state.cellsArray[4].placed === state.cellsArray[6].placed&& state.cellsArray[6].placed !== ''){
+                this.victory = true;
+                state.cellsArray[2].isAWinner = true;
+                state.cellsArray[4].isAWinner = true;
+                state.cellsArray[6].isAWinner = true;
+            }
+    };
+    return { cellsArray, turnIsX, validateEmptyCell,placeValueintoCell,ResetCells, victory,checkForWin};
 }());
 
 // State modification functions ok
@@ -68,9 +124,16 @@ state.cellsArray.forEach(function(element) {
     if(element.id === 0 || element.id === 3 || element.id === 6){
         newBoardCells += `<div class="row">`;
     }
+    
+    if(element.isAWinner){
+        newBoardCells += `<div class="cell win" id="${element.id}">
+             <p>${element.placed? element.placed : '&nbsp;'}</p>
+             </div>`;
+    }else {
     newBoardCells += `<div class="cell" id="${element.id}">
              <p>${element.placed? element.placed : '&nbsp;'}</p>
              </div>`;
+    }
     if(element.id === 2 || element.id === 5 || element.id === 8){
         newBoardCells += `</div>`;
     }
@@ -105,16 +168,21 @@ function handlerClickOnCell(){
         //see what we are working with
         
         let targetId = $(event.target).closest('div').attr('id');
-        console.log(targetId);
+        
         // jquery traverse to get the id of object of the clicked cell. (state.cellsArray[me])
         //send ^ into lines 64,65 params.
         try {
         state.validateEmptyCell(targetId);//first check if legal move
-        state.placeValueintoCell(targetId);//make the move
+        if(!state.victory){
+            //here we can only place move if nobody has won
+            state.placeValueintoCell(targetId);//make the move
+            state.checkForWin();//did we win?
+        }
         }
         catch(err){
             console.log(err.message);
         }
+        
         renderBoard();
     });
 }
